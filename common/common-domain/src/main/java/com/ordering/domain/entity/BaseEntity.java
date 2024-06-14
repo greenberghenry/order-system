@@ -1,0 +1,29 @@
+package com.ordering.domain.entity;
+
+import java.util.Objects;
+
+public abstract class BaseEntity<ID> {
+  protected ID id;
+
+  public ID getId() {
+    return id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    BaseEntity<?> that = (BaseEntity<?>) o;
+    return Objects.equals(id, that.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
+
+  @Override
+  public String toString() {
+    return "BaseEntity{" + "id=" + id + '}';
+  }
+}
