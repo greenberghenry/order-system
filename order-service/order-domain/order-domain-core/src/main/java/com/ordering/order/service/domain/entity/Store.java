@@ -11,7 +11,7 @@ public class Store extends AggregateRoot<StoreId> {
   private boolean active;
 
   private Store(Builder builder) {
-    super.id = builder.storeId;
+    super.setId(builder.storeId);
     this.products = builder.products;
     this.active = builder.active;
   }
@@ -24,6 +24,10 @@ public class Store extends AggregateRoot<StoreId> {
     return active;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static final class Builder {
     private StoreId storeId;
     private Map<ProductId, Product> products;
@@ -31,11 +35,7 @@ public class Store extends AggregateRoot<StoreId> {
 
     private Builder() {}
 
-    public static Builder builder() {
-      return new Builder();
-    }
-
-    public Builder restaurantId(StoreId val) {
+    public Builder storeId(StoreId val) {
       storeId = val;
       return this;
     }

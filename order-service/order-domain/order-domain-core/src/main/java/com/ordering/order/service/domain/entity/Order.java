@@ -2,13 +2,14 @@ package com.ordering.order.service.domain.entity;
 
 import com.ordering.domain.entity.AggregateRoot;
 import com.ordering.domain.value.*;
-import com.ordering.order.service.domain.exception.OrderDomainExeption;
+import com.ordering.order.service.domain.exception.OrderDomainException;
 import com.ordering.order.service.domain.value.OrderItemId;
 import com.ordering.order.service.domain.value.StreetAddress;
 import com.ordering.order.service.domain.value.TrackingId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.val;
 
 public class Order extends AggregateRoot<OrderId> {
   private final CustomerId customerId;
@@ -22,7 +23,7 @@ public class Order extends AggregateRoot<OrderId> {
   private List<String> failureMessages;
 
   public void initializeOrder() {
-    super.id = new OrderId(UUID.randomUUID());
+    super.setId(new OrderId(UUID.randomUUID()));
     this.trackingId = new TrackingId(UUID.randomUUID());
     this.orderStatus = OrderStatus.PENDING;
     initializeOrderItems();
@@ -36,21 +37,21 @@ public class Order extends AggregateRoot<OrderId> {
 
   public void pay() {
     if (orderStatus != OrderStatus.PENDING) {
-      throw new OrderDomainExeption("Order is not in correct state for pay operation");
+      throw new OrderDomainException("Order is not in correct state for pay operation");
     }
     orderStatus = OrderStatus.PAID;
   }
 
   public void approve() {
     if (orderStatus != OrderStatus.PAID) {
-      throw new OrderDomainExeption("Order is not in correct state for approve operation");
+      throw new OrderDomainException("Order is not in correct state for approve operation");
     }
     orderStatus = OrderStatus.APPROVED;
   }
 
   public void initCancel(List<String> messages) {
     if (orderStatus != OrderStatus.PAID) {
-      throw new OrderDomainExeption(
+      throw new OrderDomainException(
           "Order is not in correct state for initializing cancel operation");
     }
     orderStatus = OrderStatus.CANCELLING;
@@ -69,14 +70,14 @@ public class Order extends AggregateRoot<OrderId> {
 
   public void cancel(List<String> messages) {
     if (!(orderStatus == OrderStatus.PENDING || orderStatus == OrderStatus.CANCELLING)) {
-      throw new OrderDomainExeption("Order is not in correct state for cancel operation");
+      throw new OrderDomainException("Order is not in correct state for cancel operation");
     }
     orderStatus = OrderStatus.CANCELLED;
     updateFailureMessages(messages);
   }
 
   private void validateItemsPrice() {
-    var itemsTotal =
+    val itemsTotal =
         items.stream()
             .map(
                 item -> {
@@ -85,14 +86,14 @@ public class Order extends AggregateRoot<OrderId> {
                 })
             .reduce(Money.ZERO, Money::add);
     if (!itemsTotal.equals(price)) {
-      throw new OrderDomainExeption(
+      throw new OrderDomainException(
           "Total price: " + price.amount() + " is not equal to " + itemsTotal.amount());
     }
   }
 
   private void validateItemPrice(OrderItem item) {
     if (!item.isPriceValid()) {
-      throw new OrderDomainExeption(
+      throw new OrderDomainException(
           "Order item price: "
               + item.getPrice().amount()
               + " is not valid for product "
@@ -102,25 +103,25 @@ public class Order extends AggregateRoot<OrderId> {
 
   private void validateTotalPrice() {
     if (price == null || !price.isGreaterThanZero()) {
-      throw new OrderDomainExeption("Total price must be greater than zero");
+      throw new OrderDomainException("Total price must be greater than zero");
     }
   }
 
   private void validateInitialOrder() {
-    if (orderStatus != null || id != null) {
-      throw new OrderDomainExeption("Order is not in correct state for initialization");
+    if (orderStatus != null || super.getId() != null) {
+      throw new OrderDomainException("Order is not in correct state for initialization");
     }
   }
 
   private void initializeOrderItems() {
     var itemId = 1L;
     for (OrderItem item : items) {
-      item.initializeItem(super.id, new OrderItemId(itemId++));
+      item.initializeItem(super.getId(), new OrderItemId(itemId++));
     }
   }
 
   private Order(Builder builder) {
-    super.id = builder.orderId;
+    super.setId(builder.orderId);
     this.customerId = builder.customerId;
     this.storeId = builder.storeId;
     this.deliveryAddress = builder.deliveryAddress;
@@ -163,6 +164,10 @@ public class Order extends AggregateRoot<OrderId> {
     return failureMessages;
   }
 
+  public static Builder builder() {
+    return new Builder();
+  }
+
   public static final class Builder {
     private OrderId orderId;
     private CustomerId customerId;
@@ -175,10 +180,6 @@ public class Order extends AggregateRoot<OrderId> {
     private List<String> failureMessages;
 
     private Builder() {}
-
-    public static Builder builder() {
-      return new Builder();
-    }
 
     public Builder orderId(OrderId val) {
       orderId = val;

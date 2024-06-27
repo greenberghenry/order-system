@@ -6,7 +6,7 @@ import com.ordering.order.service.domain.entity.Store;
 import com.ordering.order.service.domain.event.OrderCancelledEvent;
 import com.ordering.order.service.domain.event.OrderCreatedEvent;
 import com.ordering.order.service.domain.event.OrderPaidEvent;
-import com.ordering.order.service.domain.exception.OrderDomainExeption;
+import com.ordering.order.service.domain.exception.OrderDomainException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -25,7 +25,7 @@ public class OrderDomainServiceImpl implements OrderDomainService {
     order.validateOrder();
     order.initializeOrder();
 
-    log.info("Order {} was initiated", order.getId());
+    log.info("Order {} was initiated", order.getId().value());
     return new OrderCreatedEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
   }
 
@@ -42,7 +42,7 @@ public class OrderDomainServiceImpl implements OrderDomainService {
 
   private void validateStore(Store store) {
     if (!store.isActive()) {
-      throw new OrderDomainExeption("Store " + store.getId() + " is currently not active");
+      throw new OrderDomainException("Store " + store.getId().value() + " is currently not active");
     }
   }
 
@@ -50,26 +50,26 @@ public class OrderDomainServiceImpl implements OrderDomainService {
   public OrderPaidEvent payOrder(Order order) {
     order.pay();
 
-    log.info("Order {} was paid", order.getId());
+    log.info("Order {} was paid", order.getId().value());
     return new OrderPaidEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
   }
 
   @Override
   public void approveOrder(Order order) {
     order.approve();
-    log.info("Order {} was approved", order.getId());
+    log.info("Order {} was approved", order.getId().value());
   }
 
   @Override
   public OrderCancelledEvent cancelOrderPayment(Order order, List<String> failureMessages) {
     order.initCancel(failureMessages);
-    log.info("Order payment {} was cancelled", order.getId());
+    log.info("Order payment {} was cancelled", order.getId().value());
     return new OrderCancelledEvent(order, ZonedDateTime.now(ZoneId.of(UTC)));
   }
 
   @Override
   public void cancelOrder(Order order, List<String> failureMessages) {
     order.cancel(failureMessages);
-    log.info("Order {} was cancelled", order.getId());
+    log.info("Order {} was cancelled", order.getId().value());
   }
 }

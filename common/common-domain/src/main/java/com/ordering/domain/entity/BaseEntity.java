@@ -3,10 +3,14 @@ package com.ordering.domain.entity;
 import java.util.Objects;
 
 public abstract class BaseEntity<ID> {
-  protected ID id;
+  private ID id;
 
   public ID getId() {
     return id;
+  }
+
+  public void setId(ID id) {
+    this.id = id;
   }
 
   @Override
