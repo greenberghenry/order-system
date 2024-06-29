@@ -1,0 +1,86 @@
+{
+  "namespace": "com.order.system.kafka.model.avro",
+  "type": "record",
+  "name": "StoreApprovalRequestAvroModel",
+  "fields": [
+    {
+      "name": "id",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "sagaId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "storeId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "orderId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "storeOrderStatus",
+      "type": {
+        "type": "enum",
+        "name": "StoreOrderStatus",
+        "symbols": [
+          "PAID"
+        ]
+      }
+    },
+    {
+      "name": "products",
+      "type": {
+        "type": "array",
+        "items": {
+          "name": "Product",
+          "type": "record",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "type": "string",
+                "logicalType": "uuid"
+              }
+            },
+            {
+              "name": "quantity",
+              "type": {
+                "type": "int"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "price",
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 10,
+        "scale": 2
+      }
+    },
+    {
+      "name": "createdAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}

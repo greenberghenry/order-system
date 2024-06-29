@@ -26,6 +26,9 @@
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <lombok.version>1.18.32</lombok.version>
         <spotless.version>2.43.0</spotless.version>
+        <kafka-avro-serializer.version>7.6.0</kafka-avro-serializer.version>
+        <avro.version>1.11.3</avro.version>
+        <spring-kafka.version>3.2.1</spring-kafka.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
