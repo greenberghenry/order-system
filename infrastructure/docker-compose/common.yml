@@ -1,0 +1,3 @@
+networks:
+  order-system:
+    driver: bridge
