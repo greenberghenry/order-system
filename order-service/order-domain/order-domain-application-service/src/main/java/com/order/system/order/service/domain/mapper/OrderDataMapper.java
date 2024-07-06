@@ -6,7 +6,8 @@ import com.order.system.domain.value.ProductId;
 import com.order.system.domain.value.StoreId;
 import com.order.system.order.service.domain.dto.create.CreateOrderCommand;
 import com.order.system.order.service.domain.dto.create.CreateOrderResponse;
-import com.order.system.order.service.domain.dto.create.OrderAddress;
+import com.order.system.order.service.domain.dto.create.OrderItemDto;
+import com.order.system.order.service.domain.dto.create.StreetAddressDto;
 import com.order.system.order.service.domain.dto.track.TrackOrderResponse;
 import com.order.system.order.service.domain.entity.Order;
 import com.order.system.order.service.domain.entity.OrderItem;
@@ -25,20 +26,21 @@ public class OrderDataMapper {
 
   public Store createOrderCommandToStore(CreateOrderCommand command) {
     return Store.builder()
-        .storeId(new StoreId(command.getStoreId()))
+        .id(StoreId.of(command.getStoreId()))
         .products(
             command.getItems().stream()
-                .map(c -> new ProductId(c.getProductId()))
-                .collect(Collectors.toMap(Function.identity(), Product::new)))
+                .map(c -> ProductId.of(c.getProductId()))
+                .collect(
+                    Collectors.toMap(Function.identity(), id -> Product.builder().id(id).build())))
         .build();
   }
 
   public Order createOrderCommandToOrder(CreateOrderCommand command) {
     return Order.builder()
-        .customerId(new CustomerId(command.getCustomerId()))
-        .storeId(new StoreId(command.getStoreId()))
+        .customerId(CustomerId.of(command.getCustomerId()))
+        .storeId(StoreId.of(command.getStoreId()))
         .deliveryAddress(orderAddressToStreetAddress(command.getAddress()))
-        .price(new Money(command.getPrice()))
+        .price(Money.of(command.getPrice()))
         .items(orderItemsToOrderItemEntities(command.getItems()))
         .build();
   }
@@ -60,21 +62,21 @@ public class OrderDataMapper {
         .build();
   }
 
-  private List<OrderItem> orderItemsToOrderItemEntities(
-      List<com.order.system.order.service.domain.dto.create.OrderItem> orderItems) {
-    return orderItems.stream()
+  private List<OrderItem> orderItemsToOrderItemEntities(List<OrderItemDto> orderItemDtos) {
+    return orderItemDtos.stream()
         .map(
-            orderItem ->
+            orderItemDto ->
                 OrderItem.builder()
-                    .product(new Product(new ProductId(orderItem.getProductId())))
-                    .price(new Money(orderItem.getPrice()))
-                    .quantity(orderItem.getQuantity())
-                    .total(new Money(orderItem.getTotal()))
+                    .product(
+                        Product.builder().id(ProductId.of(orderItemDto.getProductId())).build())
+                    .price(Money.of(orderItemDto.getPrice()))
+                    .quantity(orderItemDto.getQuantity())
+                    .total(Money.of(orderItemDto.getTotal()))
                     .build())
         .toList();
   }
 
-  private StreetAddress orderAddressToStreetAddress(OrderAddress address) {
+  private StreetAddress orderAddressToStreetAddress(StreetAddressDto address) {
     return StreetAddress.builder()
         .id(UUID.randomUUID())
         .street(address.getStreet())

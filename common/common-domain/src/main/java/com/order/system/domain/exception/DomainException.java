@@ -1,12 +1,6 @@
 package com.order.system.domain.exception;
 
-public class DomainException extends RuntimeException {
+import lombok.experimental.StandardException;
 
-  public DomainException(String message) {
-    super(message);
-  }
-
-  public DomainException(String message, Throwable cause) {
-    super(message, cause);
-  }
-}
+@StandardException
+public class DomainException extends RuntimeException {}

@@ -9,23 +9,25 @@ import com.order.system.order.service.domain.value.TrackingId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import lombok.val;
+import lombok.*;
 
-public class Order extends AggregateRoot<OrderId> {
+@Data
+@Builder
+public class Order implements AggregateRoot {
+  @EqualsAndHashCode.Include private OrderId id;
+  private TrackingId trackingId;
+  private OrderStatus orderStatus;
+  private List<String> failureMessages;
   private final CustomerId customerId;
   private final StoreId storeId;
   private final StreetAddress deliveryAddress;
   private final Money price;
   private final List<OrderItem> items;
 
-  private TrackingId trackingId;
-  private OrderStatus orderStatus;
-  private List<String> failureMessages;
-
   public void initializeOrder() {
-    super.setId(new OrderId(UUID.randomUUID()));
-    this.trackingId = new TrackingId(UUID.randomUUID());
-    this.orderStatus = OrderStatus.PENDING;
+    id = OrderId.of(UUID.randomUUID());
+    trackingId = TrackingId.of(UUID.randomUUID());
+    orderStatus = OrderStatus.PENDING;
     initializeOrderItems();
   }
 
@@ -108,7 +110,7 @@ public class Order extends AggregateRoot<OrderId> {
   }
 
   private void validateInitialOrder() {
-    if (orderStatus != null || super.getId() != null) {
+    if (orderStatus != null || id != null) {
       throw new OrderDomainException("Order is not in correct state for initialization");
     }
   }
@@ -116,118 +118,7 @@ public class Order extends AggregateRoot<OrderId> {
   private void initializeOrderItems() {
     var itemId = 1L;
     for (OrderItem item : items) {
-      item.initializeItem(super.getId(), new OrderItemId(itemId++));
-    }
-  }
-
-  private Order(Builder builder) {
-    super.setId(builder.orderId);
-    this.customerId = builder.customerId;
-    this.storeId = builder.storeId;
-    this.deliveryAddress = builder.deliveryAddress;
-    this.price = builder.price;
-    this.items = builder.items;
-    this.trackingId = builder.trackingId;
-    this.orderStatus = builder.orderStatus;
-    this.failureMessages = builder.failureMessages;
-  }
-
-  public CustomerId getCustomerId() {
-    return customerId;
-  }
-
-  public StoreId getStoreId() {
-    return storeId;
-  }
-
-  public StreetAddress getDeliveryAddress() {
-    return deliveryAddress;
-  }
-
-  public Money getPrice() {
-    return price;
-  }
-
-  public List<OrderItem> getItems() {
-    return items;
-  }
-
-  public TrackingId getTrackingId() {
-    return trackingId;
-  }
-
-  public OrderStatus getOrderStatus() {
-    return orderStatus;
-  }
-
-  public List<String> getFailureMessages() {
-    return failureMessages;
-  }
-
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  public static final class Builder {
-    private OrderId orderId;
-    private CustomerId customerId;
-    private StoreId storeId;
-    private StreetAddress deliveryAddress;
-    private Money price;
-    private List<OrderItem> items;
-    private TrackingId trackingId;
-    private OrderStatus orderStatus;
-    private List<String> failureMessages;
-
-    private Builder() {}
-
-    public Builder orderId(OrderId val) {
-      orderId = val;
-      return this;
-    }
-
-    public Builder customerId(CustomerId val) {
-      customerId = val;
-      return this;
-    }
-
-    public Builder storeId(StoreId val) {
-      storeId = val;
-      return this;
-    }
-
-    public Builder deliveryAddress(StreetAddress val) {
-      deliveryAddress = val;
-      return this;
-    }
-
-    public Builder price(Money val) {
-      price = val;
-      return this;
-    }
-
-    public Builder items(List<OrderItem> val) {
-      items = val;
-      return this;
-    }
-
-    public Builder trackingId(TrackingId val) {
-      trackingId = val;
-      return this;
-    }
-
-    public Builder orderStatus(OrderStatus val) {
-      orderStatus = val;
-      return this;
-    }
-
-    public Builder failureMessages(List<String> val) {
-      failureMessages = val;
-      return this;
-    }
-
-    public Order build() {
-      return new Order(this);
+      item.initializeItem(id, OrderItemId.of(itemId++));
     }
   }
 }

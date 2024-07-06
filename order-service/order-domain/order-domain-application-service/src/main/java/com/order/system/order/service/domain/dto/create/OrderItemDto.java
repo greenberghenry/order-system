@@ -8,7 +8,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class OrderItem {
+public class OrderItemDto {
   @NotNull UUID productId;
   @NotNull Integer quantity;
   @NotNull BigDecimal price;

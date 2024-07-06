@@ -7,7 +7,7 @@ import lombok.Value;
 
 @Value
 @Builder
-public class OrderAddress {
+public class StreetAddressDto {
   @NotNull @Max(value = 50)
   String street;
 

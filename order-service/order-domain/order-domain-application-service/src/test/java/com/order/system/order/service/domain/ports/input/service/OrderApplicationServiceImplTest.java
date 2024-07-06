@@ -7,8 +7,8 @@ import static org.mockito.Mockito.when;
 import com.order.system.domain.value.*;
 import com.order.system.order.service.domain.config.OrderTestConfiguration;
 import com.order.system.order.service.domain.dto.create.CreateOrderCommand;
-import com.order.system.order.service.domain.dto.create.OrderAddress;
-import com.order.system.order.service.domain.dto.create.OrderItem;
+import com.order.system.order.service.domain.dto.create.OrderItemDto;
+import com.order.system.order.service.domain.dto.create.StreetAddressDto;
 import com.order.system.order.service.domain.entity.Customer;
 import com.order.system.order.service.domain.entity.Order;
 import com.order.system.order.service.domain.entity.Product;
@@ -52,7 +52,7 @@ class OrderApplicationServiceImplTest {
           .customerId(CUSTOMER_ID)
           .storeId(STORE_ID)
           .address(
-              OrderAddress.builder()
+              StreetAddressDto.builder()
                   .street("street_1")
                   .zip("1000AB")
                   .city("Paris")
@@ -61,13 +61,13 @@ class OrderApplicationServiceImplTest {
           .price(PRICE)
           .items(
               List.of(
-                  OrderItem.builder()
+                  OrderItemDto.builder()
                       .productId(PRODUCT_ID_1)
                       .quantity(1)
                       .price(new BigDecimal("50.00"))
                       .total(new BigDecimal("50.00"))
                       .build(),
-                  OrderItem.builder()
+                  OrderItemDto.builder()
                       .productId(PRODUCT_ID_2)
                       .quantity(3)
                       .price(new BigDecimal("50.00"))
@@ -79,7 +79,7 @@ class OrderApplicationServiceImplTest {
           .customerId(CUSTOMER_ID)
           .storeId(STORE_ID)
           .address(
-              OrderAddress.builder()
+              StreetAddressDto.builder()
                   .street("street_1")
                   .zip("1000AB")
                   .city("Paris")
@@ -88,13 +88,13 @@ class OrderApplicationServiceImplTest {
           .price(new BigDecimal("250.00"))
           .items(
               List.of(
-                  OrderItem.builder()
+                  OrderItemDto.builder()
                       .productId(PRODUCT_ID_1)
                       .quantity(1)
                       .price(new BigDecimal("50.00"))
                       .total(new BigDecimal("50.00"))
                       .build(),
-                  OrderItem.builder()
+                  OrderItemDto.builder()
                       .productId(PRODUCT_ID_2)
                       .quantity(3)
                       .price(new BigDecimal("50.00"))
@@ -106,7 +106,7 @@ class OrderApplicationServiceImplTest {
           .customerId(CUSTOMER_ID)
           .storeId(STORE_ID)
           .address(
-              OrderAddress.builder()
+              StreetAddressDto.builder()
                   .street("street_1")
                   .zip("1000AB")
                   .city("Paris")
@@ -115,13 +115,13 @@ class OrderApplicationServiceImplTest {
           .price(new BigDecimal("210.00"))
           .items(
               List.of(
-                  OrderItem.builder()
+                  OrderItemDto.builder()
                       .productId(PRODUCT_ID_1)
                       .quantity(1)
                       .price(new BigDecimal("60.00"))
                       .total(new BigDecimal("60.00"))
                       .build(),
-                  OrderItem.builder()
+                  OrderItemDto.builder()
                       .productId(PRODUCT_ID_2)
                       .quantity(3)
                       .price(new BigDecimal("50.00"))
@@ -131,26 +131,28 @@ class OrderApplicationServiceImplTest {
 
   @BeforeAll
   void setUp() {
-    val customer = Customer.builder().customerId(new CustomerId(CUSTOMER_ID)).build();
+    val customer = Customer.builder().id(CustomerId.of(CUSTOMER_ID)).build();
     val storeResponse =
         Store.builder()
-            .storeId(new StoreId(createOrderCommand.getStoreId()))
+            .id(StoreId.of(createOrderCommand.getStoreId()))
             .products(
                 Map.of(
-                    new ProductId(PRODUCT_ID_1),
-                    new Product(
-                        new ProductId(PRODUCT_ID_1),
-                        new Money(new BigDecimal("50.00")),
-                        "product-1"),
-                    new ProductId(PRODUCT_ID_2),
-                    new Product(
-                        new ProductId(PRODUCT_ID_2),
-                        new Money(new BigDecimal("50.00")),
-                        "product-2")))
+                    ProductId.of(PRODUCT_ID_1),
+                    Product.builder()
+                        .id(ProductId.of(PRODUCT_ID_1))
+                        .name("product-1")
+                        .price(Money.of(new BigDecimal("50.00")))
+                        .build(),
+                    ProductId.of(PRODUCT_ID_2),
+                    Product.builder()
+                        .id(ProductId.of(PRODUCT_ID_2))
+                        .name("product-2")
+                        .price(Money.of(new BigDecimal("50.00")))
+                        .build()))
             .active(true)
             .build();
     val order = orderDataMapper.createOrderCommandToOrder(createOrderCommand);
-    order.setId(new OrderId(ORDER_ID));
+    order.setId(OrderId.of(ORDER_ID));
 
     when(customerRepository.findById(CUSTOMER_ID)).thenReturn(Optional.of(customer));
     when(storeRepository.findInformation(
@@ -191,19 +193,21 @@ class OrderApplicationServiceImplTest {
   public void testCreateOrderWithPassiveRestaurant() {
     Store storeResponse =
         Store.builder()
-            .storeId(new StoreId(createOrderCommand.getStoreId()))
+            .id(StoreId.of(createOrderCommand.getStoreId()))
             .products(
                 Map.of(
-                    new ProductId(PRODUCT_ID_1),
-                    new Product(
-                        new ProductId(PRODUCT_ID_1),
-                        new Money(new BigDecimal("50.00")),
-                        "product-1"),
-                    new ProductId(PRODUCT_ID_2),
-                    new Product(
-                        new ProductId(PRODUCT_ID_2),
-                        new Money(new BigDecimal("50.00")),
-                        "product-2")))
+                    ProductId.of(PRODUCT_ID_1),
+                        Product.builder()
+                            .id(ProductId.of(PRODUCT_ID_1))
+                            .name("product-1")
+                            .price(Money.of(new BigDecimal("50.00")))
+                            .build(),
+                    ProductId.of(PRODUCT_ID_2),
+                        Product.builder()
+                            .id(ProductId.of(PRODUCT_ID_2))
+                            .name("product-2")
+                            .price(Money.of(new BigDecimal("50.00")))
+                            .build()))
             .active(false)
             .build();
     when(storeRepository.findInformation(

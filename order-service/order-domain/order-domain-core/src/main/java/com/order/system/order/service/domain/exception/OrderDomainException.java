@@ -1,14 +1,7 @@
 package com.order.system.order.service.domain.exception;
 
 import com.order.system.domain.exception.DomainException;
+import lombok.experimental.StandardException;
 
-public class OrderDomainException extends DomainException {
-
-  public OrderDomainException(String message) {
-    super(message);
-  }
-
-  public OrderDomainException(String message, Throwable cause) {
-    super(message, cause);
-  }
-}
+@StandardException
+public class OrderDomainException extends DomainException {}
