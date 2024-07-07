@@ -24,6 +24,8 @@ public class Order implements AggregateRoot {
   private final Money price;
   private final List<OrderItem> items;
 
+  public static final String FAILURE_MESSAGES_DELIMITER = ",";
+
   public void initializeOrder() {
     id = OrderId.of(UUID.randomUUID());
     trackingId = TrackingId.of(UUID.randomUUID());
