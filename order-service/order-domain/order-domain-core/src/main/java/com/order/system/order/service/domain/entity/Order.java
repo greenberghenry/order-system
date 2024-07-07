@@ -3,9 +3,7 @@ package com.order.system.order.service.domain.entity;
 import com.order.system.domain.entity.AggregateRoot;
 import com.order.system.domain.value.*;
 import com.order.system.order.service.domain.exception.OrderDomainException;
-import com.order.system.order.service.domain.value.OrderItemId;
 import com.order.system.order.service.domain.value.StreetAddress;
-import com.order.system.order.service.domain.value.TrackingId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -14,12 +12,12 @@ import lombok.*;
 @Data
 @Builder
 public class Order implements AggregateRoot {
-  @EqualsAndHashCode.Include private OrderId id;
-  private TrackingId trackingId;
+  @EqualsAndHashCode.Include private UUID orderId;
+  private UUID trackingId;
   private OrderStatus orderStatus;
   private List<String> failureMessages;
-  private final CustomerId customerId;
-  private final StoreId storeId;
+  private final UUID customerId;
+  private final UUID storeId;
   private final StreetAddress deliveryAddress;
   private final Money price;
   private final List<OrderItem> items;
@@ -27,8 +25,8 @@ public class Order implements AggregateRoot {
   public static final String FAILURE_MESSAGES_DELIMITER = ",";
 
   public void initializeOrder() {
-    id = OrderId.of(UUID.randomUUID());
-    trackingId = TrackingId.of(UUID.randomUUID());
+    orderId = UUID.randomUUID();
+    trackingId = UUID.randomUUID();
     orderStatus = OrderStatus.PENDING;
     initializeOrderItems();
   }
@@ -101,7 +99,7 @@ public class Order implements AggregateRoot {
           "Order item price: "
               + item.getPrice().amount()
               + " is not valid for product "
-              + item.getProduct().getId().value());
+              + item.getProduct().getProductId());
     }
   }
 
@@ -112,7 +110,7 @@ public class Order implements AggregateRoot {
   }
 
   private void validateInitialOrder() {
-    if (orderStatus != null || id != null) {
+    if (orderStatus != null || orderId != null) {
       throw new OrderDomainException("Order is not in correct state for initialization");
     }
   }
@@ -120,7 +118,7 @@ public class Order implements AggregateRoot {
   private void initializeOrderItems() {
     var itemId = 1L;
     for (OrderItem item : items) {
-      item.initializeItem(id, OrderItemId.of(itemId++));
+      item.initializeItem(orderId, itemId++);
     }
   }
 }

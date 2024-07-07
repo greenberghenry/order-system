@@ -9,9 +9,7 @@ import com.order.system.order.service.data.order.entity.OrderItemEntity;
 import com.order.system.order.service.domain.entity.Order;
 import com.order.system.order.service.domain.entity.OrderItem;
 import com.order.system.order.service.domain.entity.Product;
-import com.order.system.order.service.domain.value.OrderItemId;
 import com.order.system.order.service.domain.value.StreetAddress;
-import com.order.system.order.service.domain.value.TrackingId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,10 +24,10 @@ public class OrderDataMapper {
   public OrderEntity orderToOrderEntity(Order order) {
     val orderEntity =
         OrderEntity.builder()
-            .id(order.getId().value())
-            .customerId(order.getCustomerId().value())
-            .trackingId(order.getTrackingId().value())
-            .storeId(order.getStoreId().value())
+            .id(order.getOrderId())
+            .customerId(order.getCustomerId())
+            .trackingId(order.getTrackingId())
+            .storeId(order.getStoreId())
             .address(deliveryAddressToAddressEntity(order.getDeliveryAddress()))
             .price(order.getPrice().amount())
             .items(orderItemsToOrderItemEntities(order.getItems()))
@@ -46,10 +44,10 @@ public class OrderDataMapper {
 
   public Order orderEntityToOrder(OrderEntity orderEntity) {
     return Order.builder()
-        .id(OrderId.of(orderEntity.getId()))
-        .customerId(CustomerId.of(orderEntity.getCustomerId()))
-        .storeId(StoreId.of(orderEntity.getStoreId()))
-        .trackingId(TrackingId.of(orderEntity.getTrackingId()))
+        .orderId(orderEntity.getId())
+        .customerId(orderEntity.getCustomerId())
+        .storeId(orderEntity.getStoreId())
+        .trackingId(orderEntity.getTrackingId())
         .deliveryAddress(addressEntityToDeliveryAddress(orderEntity.getAddress()))
         .price(Money.of(orderEntity.getPrice()))
         .items(orderItemEntitiesToOrderItem(orderEntity.getItems()))
@@ -68,12 +66,14 @@ public class OrderDataMapper {
         .map(
             orderItemEntity ->
                 OrderItem.builder()
-                    .id(OrderItemId.of(orderItemEntity.getId()))
+                    .orderItemId(orderItemEntity.getId())
                     .total(Money.of(orderItemEntity.getTotal()))
                     .quantity(orderItemEntity.getQuantity())
                     .price(Money.of(orderItemEntity.getPrice()))
                     .product(
-                        Product.builder().id(ProductId.of(orderItemEntity.getProductId())).build())
+                        Product.builder()
+                            .productId(orderItemEntity.getProductId())
+                            .build())
                     .build())
         .collect(Collectors.toList());
   }
@@ -95,8 +95,8 @@ public class OrderDataMapper {
                 OrderItemEntity.builder()
                     .total(orderItem.getTotal().amount())
                     .quantity(orderItem.getQuantity())
-                    .productId(orderItem.getProduct().getId().value())
-                    .id(orderItem.getId().value())
+                    .productId(orderItem.getProduct().getProductId())
+                    .id(orderItem.getOrderItemId())
                     .price(orderItem.getPrice().amount())
                     .build())
         .collect(Collectors.toList());

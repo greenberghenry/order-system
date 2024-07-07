@@ -1,12 +1,12 @@
 package com.order.system.order.service.data.store.mapper;
 
 import com.order.system.domain.value.Money;
-import com.order.system.domain.value.ProductId;
-import com.order.system.domain.value.StoreId;
 import com.order.system.order.service.data.store.entity.StoreEntity;
 import com.order.system.order.service.data.store.exception.StoreDataException;
 import com.order.system.order.service.domain.entity.Product;
 import com.order.system.order.service.domain.entity.Store;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class StoreDataMapper {
 
   public List<UUID> storeToStoreProductIds(Store store) {
-    return store.getProducts().keySet().stream().map(ProductId::value).collect(Collectors.toList());
+    return new ArrayList<>(store.getProducts().keySet());
   }
 
   public Store storeEntityToStore(List<StoreEntity> storeEntities) {
@@ -31,13 +31,13 @@ public class StoreDataMapper {
             .map(
                 entity ->
                     Product.builder()
-                        .id(ProductId.of(entity.getProductId()))
+                        .productId(entity.getProductId())
                         .name(entity.getProductName())
                         .price(Money.of(entity.getProductPrice()))
                         .build())
-            .collect(Collectors.toMap(Product::getId, Function.identity()));
+            .collect(Collectors.toMap(Product::getProductId, Function.identity()));
     return Store.builder()
-        .id(StoreId.of(storeEntity.getStoreId()))
+        .sroreId(storeEntity.getStoreId())
         .active(storeEntity.getStoreActive())
         .products(storeProducts)
         .build();

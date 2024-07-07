@@ -1,9 +1,6 @@
 package com.order.system.order.service.domain.mapper;
 
-import com.order.system.domain.value.CustomerId;
 import com.order.system.domain.value.Money;
-import com.order.system.domain.value.ProductId;
-import com.order.system.domain.value.StoreId;
 import com.order.system.order.service.domain.dto.create.CreateOrderCommand;
 import com.order.system.order.service.domain.dto.create.CreateOrderResponse;
 import com.order.system.order.service.domain.dto.create.OrderItemDto;
@@ -26,19 +23,20 @@ public class OrderDataMapper {
 
   public Store createOrderCommandToStore(CreateOrderCommand command) {
     return Store.builder()
-        .id(StoreId.of(command.getStoreId()))
+        .sroreId(command.getStoreId())
         .products(
             command.getItems().stream()
-                .map(c -> ProductId.of(c.getProductId()))
+                .map(OrderItemDto::getProductId)
                 .collect(
-                    Collectors.toMap(Function.identity(), id -> Product.builder().id(id).build())))
+                    Collectors.toMap(
+                        Function.identity(), id -> Product.builder().productId(id).build())))
         .build();
   }
 
   public Order createOrderCommandToOrder(CreateOrderCommand command) {
     return Order.builder()
-        .customerId(CustomerId.of(command.getCustomerId()))
-        .storeId(StoreId.of(command.getStoreId()))
+        .customerId(command.getCustomerId())
+        .storeId(command.getStoreId())
         .deliveryAddress(orderAddressToStreetAddress(command.getAddress()))
         .price(Money.of(command.getPrice()))
         .items(orderItemsToOrderItemEntities(command.getItems()))
@@ -48,7 +46,7 @@ public class OrderDataMapper {
   public CreateOrderResponse orderCreatedEventToCreateOrderResponse(
       OrderCreatedEvent event, String message) {
     return CreateOrderResponse.builder()
-        .trackingId(event.getOrder().getTrackingId().value())
+        .trackingId(event.getOrder().getTrackingId())
         .status(event.getOrder().getOrderStatus())
         .message(message)
         .build();
@@ -56,7 +54,7 @@ public class OrderDataMapper {
 
   public TrackOrderResponse orderToTrackOrderResponse(Order order) {
     return TrackOrderResponse.builder()
-        .trackingId(order.getTrackingId().value())
+        .trackingId(order.getTrackingId())
         .failureMessages(order.getFailureMessages())
         .status(order.getOrderStatus())
         .build();
@@ -67,8 +65,7 @@ public class OrderDataMapper {
         .map(
             orderItemDto ->
                 OrderItem.builder()
-                    .product(
-                        Product.builder().id(ProductId.of(orderItemDto.getProductId())).build())
+                    .product(Product.builder().productId(orderItemDto.getProductId()).build())
                     .price(Money.of(orderItemDto.getPrice()))
                     .quantity(orderItemDto.getQuantity())
                     .total(Money.of(orderItemDto.getTotal()))

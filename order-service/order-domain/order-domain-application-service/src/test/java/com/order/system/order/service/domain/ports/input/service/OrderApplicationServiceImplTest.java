@@ -131,28 +131,28 @@ class OrderApplicationServiceImplTest {
 
   @BeforeAll
   void setUp() {
-    val customer = Customer.builder().id(CustomerId.of(CUSTOMER_ID)).build();
+    val customer = Customer.builder().customerId(CUSTOMER_ID).build();
     val storeResponse =
         Store.builder()
-            .id(StoreId.of(createOrderCommand.getStoreId()))
+            .sroreId(createOrderCommand.getStoreId())
             .products(
                 Map.of(
-                    ProductId.of(PRODUCT_ID_1),
+                    PRODUCT_ID_1,
                     Product.builder()
-                        .id(ProductId.of(PRODUCT_ID_1))
+                        .productId(PRODUCT_ID_1)
                         .name("product-1")
                         .price(Money.of(new BigDecimal("50.00")))
                         .build(),
-                    ProductId.of(PRODUCT_ID_2),
+                    PRODUCT_ID_2,
                     Product.builder()
-                        .id(ProductId.of(PRODUCT_ID_2))
+                        .productId(PRODUCT_ID_2)
                         .name("product-2")
                         .price(Money.of(new BigDecimal("50.00")))
                         .build()))
             .active(true)
             .build();
     val order = orderDataMapper.createOrderCommandToOrder(createOrderCommand);
-    order.setId(OrderId.of(ORDER_ID));
+    order.setOrderId(ORDER_ID);
 
     when(customerRepository.findById(CUSTOMER_ID)).thenReturn(Optional.of(customer));
     when(storeRepository.findInformation(
@@ -193,18 +193,18 @@ class OrderApplicationServiceImplTest {
   public void testCreateOrderWithPassiveRestaurant() {
     Store storeResponse =
         Store.builder()
-            .id(StoreId.of(createOrderCommand.getStoreId()))
+            .sroreId(createOrderCommand.getStoreId())
             .products(
                 Map.of(
-                    ProductId.of(PRODUCT_ID_1),
+                    PRODUCT_ID_1,
                         Product.builder()
-                            .id(ProductId.of(PRODUCT_ID_1))
+                            .productId(PRODUCT_ID_1)
                             .name("product-1")
                             .price(Money.of(new BigDecimal("50.00")))
                             .build(),
-                    ProductId.of(PRODUCT_ID_2),
+                    PRODUCT_ID_2,
                         Product.builder()
-                            .id(ProductId.of(PRODUCT_ID_2))
+                            .productId(PRODUCT_ID_2)
                             .name("product-2")
                             .price(Money.of(new BigDecimal("50.00")))
                             .build()))

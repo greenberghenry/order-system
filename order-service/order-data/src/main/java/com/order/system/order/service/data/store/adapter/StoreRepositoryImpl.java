@@ -20,7 +20,7 @@ public class StoreRepositoryImpl implements StoreRepository {
   public Optional<Store> findInformation(Store store) {
     val storeProductIds = storeDataMapper.storeToStoreProductIds(store);
     return storeJpaRepository
-        .findByStoreIdAndProductIdIn(store.getId().value(), storeProductIds)
+        .findByStoreIdAndProductIdIn(store.getSroreId(), storeProductIds)
         .map(storeDataMapper::storeEntityToStore);
   }
 }

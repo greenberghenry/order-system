@@ -4,8 +4,9 @@ import com.order.system.order.service.data.order.mapper.OrderDataMapper;
 import com.order.system.order.service.data.order.repository.OrderJpaRepository;
 import com.order.system.order.service.domain.entity.Order;
 import com.order.system.order.service.domain.ports.output.repository.OrderRepository;
-import com.order.system.order.service.domain.value.TrackingId;
 import java.util.Optional;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +24,7 @@ public class OrderRepositoryImpl implements OrderRepository {
   }
 
   @Override
-  public Optional<Order> findByTrackingId(TrackingId id) {
-    return orderJpaRepository.findByTrackingId(id.value()).map(orderDataMapper::orderEntityToOrder);
+  public Optional<Order> findByTrackingId(UUID trackingId) {
+    return orderJpaRepository.findByTrackingId(trackingId).map(orderDataMapper::orderEntityToOrder);
   }
 }

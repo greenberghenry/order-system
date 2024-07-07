@@ -5,7 +5,6 @@ import com.order.system.order.service.domain.dto.track.TrackOrderResponse;
 import com.order.system.order.service.domain.exception.OrderNotFoundException;
 import com.order.system.order.service.domain.mapper.OrderDataMapper;
 import com.order.system.order.service.domain.ports.output.repository.OrderRepository;
-import com.order.system.order.service.domain.value.TrackingId;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -22,7 +21,7 @@ public class OrderTrackCommandHandler {
 
   @Transactional(readOnly = true)
   public TrackOrderResponse trackOrder(TrackOrderQuery query) {
-    val order = orderRepository.findByTrackingId(TrackingId.of(query.getTrackingId()));
+    val order = orderRepository.findByTrackingId(query.getTrackingId());
     if (order.isEmpty()) {
       log.warn("Could not find order with tracking id {}", query.getTrackingId());
       throw new OrderNotFoundException(
