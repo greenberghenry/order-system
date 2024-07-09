@@ -4,19 +4,20 @@ import com.order.system.domain.value.PaymentStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Value;
 
 @Value
 @Builder
 public class PaymentResponse {
-  String id;
-  String sagaId;
-  String orderId;
-  String paymentId;
-  String customerId;
+  UUID id;
+  UUID sagaId;
+  UUID orderId;
+  UUID paymentId;
+  UUID customerId;
   BigDecimal price;
-  Instant createAt;
+  Instant createdAt;
   PaymentStatus paymentStatus;
   List<String> failureMessages;
 }

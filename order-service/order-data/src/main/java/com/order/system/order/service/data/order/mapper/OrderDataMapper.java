@@ -70,10 +70,7 @@ public class OrderDataMapper {
                     .total(Money.of(orderItemEntity.getTotal()))
                     .quantity(orderItemEntity.getQuantity())
                     .price(Money.of(orderItemEntity.getPrice()))
-                    .product(
-                        Product.builder()
-                            .productId(orderItemEntity.getProductId())
-                            .build())
+                    .product(Product.builder().productId(orderItemEntity.getProductId()).build())
                     .build())
         .collect(Collectors.toList());
   }
